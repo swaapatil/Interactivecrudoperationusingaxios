@@ -1,0 +1,698 @@
+flow of application and dependencies installed:
+
+frontend dependencies: axios(thirdparty libarery need to install to fetch data from backend)
+backend dependencies: 
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongodb": "^5.1.0",
+    "nodemon": "^2.0.22"
+
+1.I started the application with backend first
+
+step 1: connected node with mongodb using MongoClient.
+
+    import { MongoClient, ObjectId } from 'mongodb';
+    
+    let db;
+
+    (async () => {
+      try {
+        const client = await MongoClient.connect('mongodb://localhost:27017');
+        db = client.db('mydb4');
+        console.log('MongoDB connected');
+      } catch (err) {
+        console.error('Failed to connect to MongoDB', err);
+      }
+    })();
+
+step 2: done crud operations and api checking 
+
+step 3: created frontend application and fetched backend data with axios and performed the add,delete and update operations in react
+
+step 4: lastly styled the ui part
+
+backend
+server.js
+// import express from  'express'
+// import bodyParser from 'body-parser';
+// import { ObjectId } from 'mongodb';
+// import cors from 'cors'
+// const app=express()
+// const port=8050
+
+
+// app.use(cors())
+// app.use(express.json())
+// app.use(bodyParser.json({limit: '10mb'}));
+// app.use(bodyParser.urlencoded({ extended: true }));
+
+// // ***********************************db connection*********************************
+// import mongodb from 'mongodb'
+// import data from './data.js'
+// let db=await mongodb.MongoClient.connect("mongodb://localhost:27017/mydb4")
+
+// db=db.db('mydb4')
+// // db.createCollection("students");
+// let Student = db.collection("students");
+
+
+// const data1=data
+// // Student.insertMany(data1)
+
+// // console.log(db)
+
+
+// // ***********************************************************************
+
+
+// app.get('/',(req,res)=>{
+//     res.json({message:"api is working"})
+// })
+
+// // getting data from database
+// app.get('/getdata',async (req,res)=>{
+//     try {
+//         const student = await Student.find().toArray();
+//         res.json(student)
+//       } 
+//     catch{
+//         console.error('Failed to get data ', err);
+//         res.status(500).send('Failed to get data ');
+//     }
+// })
+
+// // single data
+// app.get('/getdata/:id', async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     const student = await Student.findOne({ _id: new ObjectId(id) });
+//     if (student) {
+//       res.json(student);
+//     } else {
+//       res.status(404).send(`Student with id ${id} not found`);
+//     }
+//   } catch (err) {
+//     console.error(`Failed to get student with id ${id}`, err);
+//     res.status(500).send(`Failed to get student with id ${id}`);
+//   }
+// });
+
+
+// // posting data to database
+// app.post('/postdata', async (req, res) => {
+//     try {
+//       if (!req.body.email) {
+//         res.status(400).json({ error: 'Email is required' });
+//       }
+
+//       const student = await Student.insertOne({
+      
+//         first_name: req.body.first_name,
+//         last_name: req.body.last_name,
+//         email: req.body.email,
+//         gender: req.body.gender
+//       });
+
+   
+//       res.json(student);
+
+//     } catch (err) {
+//       console.error('Error handling POST request:', err);
+//       res.status(500).json({ error: 'Internal server error' });
+//     }
+//   });
+
+
+// // updating data from database 
+// app.put('/update/:_id', async (req, res) => {
+//   try {
+//     console.log(req.params)
+//     const _id = req.params._id;
+//     console.log("ID : $$$$$$$$$$$$$ Working : ", _id);
+//     if (!ObjectId.isValid(_id)) {
+//       res.status(400).send('Invalid ID');
+//       return;
+//     }
+//     const objectId = new ObjectId(_id);
+//     console.log("Object................",objectId);
+//     const updateObject = { ...req.body };
+//       delete updateObject._id;
+//     const result = await Student.updateOne({ _id: objectId }, { $set: updateObject });
+//     console.log("Result: ", result);
+//     res.json(result);
+
+//   } catch (err) {
+//     console.error('Failed to update ', err.message, err.stack);
+//     res.status(500).send('Failed to update the data');
+//   }
+// });
+
+
+
+
+
+// // deleting data from database
+// app.delete('/deletedata/:_id', async (req, res) => {
+//   try {
+//     // const id = req.params._id;
+//     // const user = await collection.deleteOne({ _id: id });
+//     // res.json(user);
+
+//     console.log(req.params)
+//     const _id = req.params._id;
+//     console.log("ID : $$$$$$$$$$$$$ Working : ", _id);
+//     if (!ObjectId.isValid(_id)) {
+//       res.status(400).send('Invalid ID');
+//       return;
+//     }
+//     const objectId = new ObjectId(_id);
+//     console.log("Object................",objectId);
+   
+     
+//     const result = await Student.deleteOne({ _id: objectId });
+//     console.log("Result: ", result);
+//     res.json(result);
+//   } catch (err) {
+//     console.error('Error :', err);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// app.listen(port,()=>{
+//     console.log(`server is runnig on port ${port}`)
+// })
+
+
+import express from 'express';
+import bodyParser from 'body-parser';
+import { MongoClient, ObjectId } from 'mongodb';
+import cors from 'cors';
+
+const app = express();
+const port = process.env.PORT || 6050;
+
+app.use(cors());
+app.use(express.json());
+// app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+// Connect to MongoDB
+let db;
+
+(async () => {
+  try {
+    const client = await MongoClient.connect('mongodb://localhost:27017');
+    db = client.db('mydb4');
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('Failed to connect to MongoDB', err);
+  }
+})();
+
+// Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'API is working' });
+});
+
+// Get all students
+app.get('/students', async (req, res) => {
+  try {
+    const students = await db.collection('students').find().toArray();
+    res.json(students);
+  } catch (err) {
+    console.error('Failed to get students', err);
+    res.status(500).send('Failed to get students');
+  }
+});
+
+// Get a student by id
+app.get('/students/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const student = await db.collection('students').findOne({ _id: new ObjectId(id) });
+    if (student) {
+      res.json(student);
+    } else {
+      res.status(404).send(`Student with id ${id} not found`);
+    }
+  } catch (err) {
+    console.error(`Failed to get student with id ${id}`, err);
+    res.status(500).send(`Failed to get student with id ${id}`);
+  }
+});
+
+// Add a new student
+app.post('/students', async (req, res) => {
+  try {
+    const { first_name, last_name, email, gender } = req.body;
+    if (!email) {
+      res.status(400).json({ error: 'Email is required' });
+      return;
+    }
+    const student = await db.collection('students').insertOne({
+      first_name,
+      last_name,
+      email,
+      gender,
+    });
+    res.json(student);
+  } catch (err) {
+    console.error('Failed to add student', err);
+    res.status(500).json({ error: 'Failed to add student' });
+  }
+});
+
+// Update a student by id
+app.put('/students/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { first_name, last_name, email, gender } = req.body;
+    const objectId = new ObjectId(id);
+    const result = await db.collection('students').updateOne(
+      { _id: objectId },
+      {
+        $set: {
+          first_name,
+          last_name,
+          email,
+          gender,
+        },
+      },
+    );
+    res.json(result);
+  } catch (err) {
+    console.error(`Failed to update student with id ${id}`, err);
+    res.status(500).send(`Failed to update student with id ${id}`);
+  }
+});
+
+// Delete a student by id
+app.delete('/students/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const objectId = new ObjectId(id);
+    const result = await db.collection('students').deleteOne({ _id: objectId });
+    res.json(result);
+  } catch (err) {
+    console.error(`Failed to delete student with id ${id}`, err);
+    res.status(500).send(`Failed to delete student with id ${id}`);
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+
+frontend 
+app.js
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
+
+const App = () => {
+  const [students, setStudents] = useState([]);
+  const [newStudent, setNewStudent] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    gender: "",
+  });
+
+
+  useEffect(() => {
+    getStudents();
+  }, []);
+
+  const getStudents = async () => {
+    try {
+      const response = await axios.get("http://localhost:6050/students");
+      setStudents(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addStudent = async () => {
+    try {
+      await axios.post("http://localhost:6050/students", newStudent);
+      setNewStudent({
+        first_name: "",
+        last_name: "",
+        email: "",
+        gender: "",
+      });
+      getStudents();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `http://localhost:6050/students/${selectedStudent._id}`,
+        selectedStudent
+      );
+      setSelectedStudent(null);
+      getStudents();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteStudent = async (id) => {
+    try {
+      await axios.delete(`http://localhost:6050/students/${id}`);
+      getStudents();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="container1">
+                    
+      <div className="container-left">
+        <div className="table-content">
+          <h1>Student data table</h1>
+         
+          <table>
+            <thead>
+              <tr>
+                <th>First_name</th>
+                <th>last_name</th>
+                <th>email</th>
+                <th>gender</th>
+                <th>action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {students.map((student) => (
+                <tr key={student._id}>
+                  <td>{student.first_name}</td>
+                  <td>{student.last_name}</td>
+                  <td>{student.email}</td>
+                  <td>{student.gender}</td>
+                  <td>
+                  <div className="buttons">
+                  <button
+                      className="delete"
+                      onClick={() => deleteStudent(student._id)}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className="update"
+                      onClick={() => setSelectedStudent(student)}
+                    >
+                      Update
+                    </button>
+                    
+                    
+                  </div>
+
+
+                  </td>
+                </tr>
+                
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+       
+            <div className="addcontent">
+            <h6>Add Student</h6>
+           {/* <form > */}
+           <div className="inputs">
+              <label className="labels">First Name:</label>
+              <input
+                type="text"
+                value={newStudent.first_name}
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, first_name: e.target.value })
+                }
+              />
+            </div>
+            <div className="inputs">
+              <label className="labels">Last Name:</label>
+              <input
+                type="text"
+                value={newStudent.last_name}
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, last_name: e.target.value })
+                }
+              />
+            </div>
+            <div className="inputs">
+              <label className="labels">Email:</label>
+              <input
+                type="text"
+                value={newStudent.email}
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, email: e.target.value })
+                }
+              />
+            </div>
+            <div className="inputs">
+              <label className="labels">Gender:</label>
+              <input
+                type="text"
+                value={newStudent.gender}
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, gender: e.target.value })
+                }
+              />
+            </div>
+            <button className="add" type="submit" onClick={addStudent}>addStudent</button>
+           {/* </form> */}
+          </div>
+         
+      </div>
+
+      <div className="container-right">
+        {selectedStudent && (
+          <div>
+            <h6>Update Student</h6>
+            <form onSubmit={handleUpdate}>
+              <div className="inputs">
+                <label className="labels">First Name:</label>
+                <input
+                  type="text"
+                  value={selectedStudent.first_name}
+                  onChange={(e) =>
+                    setSelectedStudent({
+                      ...selectedStudent,
+                      first_name: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label  className="labels">Last Name:</label>
+                <input
+                  type="text"
+                  value={selectedStudent.last_name}
+                  onChange={(e) =>
+                    setSelectedStudent({
+                      ...selectedStudent,
+                      last_name: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="labels">Email:</label>
+                <input
+                  type="text"
+                  value={selectedStudent.email}
+                  onChange={(e) =>
+                    setSelectedStudent({
+                      ...selectedStudent,
+                      email: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="labels">Gender:</label>
+                <input
+                  type="text"
+                  value={selectedStudent.gender}
+                  onChange={(e) =>
+                    setSelectedStudent({
+                      ...selectedStudent,
+                      gender: e.target.value,
+                    })
+                  }
+                />
+              </div>
+             <div className="updatebuttonsdiv">
+             <button type="submit" className="update1">Update</button>
+              <button type="button" className="cancel" onClick={() => setSelectedStudent(null)}>
+                Cancel
+              </button>
+             </div>
+            </form>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+
+
+style.css
+.container1{
+  margin: 2% ;
+  display: flex;
+  /* align-items: center; */
+  /* justify-content: center; */
+  flex-direction: column;
+  gap: 20px;
+ 
+}
+.container-left{
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 20px;
+}
+table{
+  /* width: 80%; */
+  border: 1px solid gray;
+  border-collapse: collapse;
+  text-align: center;
+  box-shadow: 0px 1px 10px rgb(148, 143, 143);
+  
+}
+ tr{
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+table th{
+  border: 1px solid gray;
+  border-collapse: collapse;
+  background-color: pink;
+  padding: 10px 40px;
+}
+table td{
+  border: 1px solid gray;
+  border-collapse: collapse;
+  padding: 10px 40px;
+  background-color: rgb(177, 226, 226);
+}
+/* thead{
+  border-bottom: 1px solid black;
+} */
+.container{
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 50px;
+}
+button{
+  border: none;
+  
+  
+}
+.buttons{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+ .delete{
+  background-color: rgb(233, 75, 75);
+  border-radius: 20px;
+  font-size: 12px;
+padding: 5px 10px;
+box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
+  .update{
+  background-color: rgb(45, 175, 235);
+  border-radius: 20px;
+  font-size: 12px;
+  padding: 5px 10px;
+  box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
+
+ form{
+  
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+ 
+  gap: 10px;
+ box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
+ .inputs{
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 2px;
+ }
+input{
+  border: none;
+  outline: none;
+  box-shadow: 0px 1px 5px rgb(148, 143, 143);
+  font-size: 12px;
+}
+ .add{
+  background-color: rgb(45, 175, 235);
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 5px 99px;
+  box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
+ .updatebuttonsdiv{
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+  font-size: 12px;
+  padding: 10px 0px 0px 0px;
+  
+ }
+ .updatebuttonsdiv button{
+  padding: 5px 15px;
+ }
+ .update1 {
+  background-color: rgb(45, 175, 235);
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 5px 99px;
+  box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
+ .cancel{
+  background-color: rgb(150, 157, 160);
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 5px 99px;
+  box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
+ 
+ .addcontent{
+  margin-top: 4.5%;
+  padding: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+ box-shadow: 0px 1px 5px rgb(148, 143, 143);
+ }
